@@ -1,5 +1,5 @@
 const net = require('net');
-const parser = require('./parser.js')
+const parser = require('./parser.js');
 
 class Request {
   // method, url = host + port + path
@@ -65,8 +65,6 @@ ${this.bodyText}`;
         }
         console.log('parser.statusLine ===', parser.statusLine);
         console.log('parser.headers ===', parser.headers);
-        // console.log('on data --->', data.toString());
-        // resolve(data.toString());
         client.end();
       });
 
@@ -245,6 +243,7 @@ void (async function () {
 
   const response = await request.send();
   console.log('response', response);
+  const dom = parser.parseHTML(response.body);
 })();
 
 // const client = net.createConnection({ host: '127.0.0.1', port: 8088 }, () => {
