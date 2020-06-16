@@ -1,0 +1,84 @@
+<div id="a">
+  1
+  <span>2</span>
+  3
+  <p>4</p>
+  5
+  <a>6</a>
+  7
+  <div>8</div>
+  9
+</div>
+<!-- 我的算法 -->
+<script>
+  let element = document.getElementById('a');
+
+  function reverseChildren(element) {
+    let children = element.childNodes;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[children.length - 1];
+      element.insertBefore(child, children[i]);
+    }
+  }
+
+  // reverseChildren(element);
+</script>
+
+<!-- winter 的基础算法 -->
+<script>
+  let element = document.getElementById('a');
+
+  function reverseChildren(element) {
+    // 由于 childNodes 是会随着 DOM 的改变而变化的类数组，所以将其转换为数组
+    let children = Array.prototype.slice.call(element.childNodes);
+
+    for (let child of children) {
+      element.removeChild(child);
+    }
+    // 聪明的清空子节点方法
+    // element.innerHTML = "";
+
+    children.reverse();
+
+    for (let child of children) {
+      element.appendChild(child);
+    }
+  }
+
+  // reverseChildren(element);
+</script>
+
+<!-- winter 的优秀算法 -->
+<!-- 这个算法其实和我的算法几乎是相同，只是这里使用的是 appendChild 而我使用的是 insertBefore -->
+<script>
+  let element = document.getElementById('a');
+
+  function reverseChildren(element) {
+    let l = element.childNodes.length; // 不会因为之后 childNodes 的变化而变化，因为是非引用类型值
+    while (l-- > 0) {
+      element.appendChild(element.childNodes[l]);
+    }
+  }
+
+  // reverseChildren(element);
+</script>
+
+<!-- winter 的满分算法 -->
+<script>
+  let element = document.getElementById('a');
+
+  function reverseChildren(element) {
+    let range = new Range();
+    range.selectNodeContents(element);
+
+    let fragment = range.extractContents();
+    let l = fragment.childNodes.length;
+    // 实际上这里还可以优化一下，一开始添加的最后一个其实没有动，可以从倒数第二个开始 append
+    while (l-- > 0) {
+      fragment.appendChild(fragment.childNodes[l]);
+    }
+    element.appendChild(fragment);
+  }
+
+  reverseChildren(element);
+</script>

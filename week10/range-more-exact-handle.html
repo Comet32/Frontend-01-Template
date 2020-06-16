@@ -1,0 +1,8 @@
+<div id="a">123<span style="background-color: bisque;">456</span>789</div>
+<script>
+  let textNode = document.getElementById('a').childNodes[0];
+  let range = new Range();
+  range.setStart(document.getElementById('a').childNodes[1].childNodes[0], 2);
+  range.setEnd(document.getElementById('a').childNodes[2], 2);
+	range.extractContents();
+</script>

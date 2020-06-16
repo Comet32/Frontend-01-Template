@@ -1,0 +1,7 @@
+<div id="a">123456789</div>
+<script>
+  let textNode = document.getElementById('a').childNodes[0];
+  let range = new Range();
+  range.setStart(textNode, 3);
+  range.setEnd(textNode, 6);
+</script>
