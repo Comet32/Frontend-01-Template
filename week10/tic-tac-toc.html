@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tic-tac-toc</title>
+    <style>
+      main {
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .checkerboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-content: space-between;
+        width: 30vw;
+        height: 30vw;
+      }
+      .cell {
+        width: 9.8vw;
+        height: 9.8vw;
+        background-color: #3d5a80;
+        line-height: 33%;
+        font-size: 4.5vw;
+        line-height: 9.8vw;
+        text-align: center;
+        color: #ee6c4d;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="checkerboard"></div>
+    </main>
+
+    <script>
+      const X = '❌';
+      const O = '⭕️';
+      let pattern = [
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0],
+      ];
+      let piece = O;
+
+      let board = document.querySelector('.checkerboard');
+
+      function render() {
+        board.innerHTML = '';
+        pattern.forEach((row, y) => {
+          row.forEach((str, x) => {
+            let cell = document.createElement('div');
+            cell.classList.add('cell');
+            cell.addEventListener('click', () => {
+              putPiece(y, x);
+            });
+            cell.innerHTML = str ? str : '';
+            board.appendChild(cell);
+          });
+        });
+      }
+
+      function putPiece(y, x) {
+        let hasPiece = !!pattern[y][x];
+        if (hasPiece) {
+          // alert('已有棋子');
+          return;
+        } else {
+          pattern[y][x] = piece;
+          piece = piece === X ? O : X;
+        }
+        render();
+      }
+
+      function check(pattern, piece, x, y) {
+        
+      }
+
+      render();
+    </script>
+  </body>
+</html>
