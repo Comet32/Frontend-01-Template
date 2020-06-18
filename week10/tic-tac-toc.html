@@ -10,6 +10,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        flex-direction: column;
       }
       .checkerboard {
         display: flex;
@@ -30,10 +31,16 @@
         color: #ee6c4d;
         cursor: pointer;
       }
+      .hint {
+        color: #293241;
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
     </style>
   </head>
   <body>
     <main>
+      <div class="hint">&nbsp;</div>
       <div class="checkerboard"></div>
     </main>
 
@@ -45,9 +52,10 @@
         [0, 0, 0],
         [0, 0, 0],
       ];
-      let piece = O;
+      let piece = O; // 棋子的种类
 
       let board = document.querySelector('.checkerboard');
+      let hintEle = document.querySelector('.hint');
 
       function render() {
         board.innerHTML = '';
@@ -66,6 +74,7 @@
 
       function putPiece(y, x) {
         let hasPiece = !!pattern[y][x];
+        let currentPiece = piece;
         if (hasPiece) {
           // alert('已有棋子');
           return;
@@ -73,11 +82,104 @@
           pattern[y][x] = piece;
           piece = piece === X ? O : X;
         }
+        // 渲染 UI
         render();
+
+        // 判断是否某一方要获胜
+        if (willWin(pattern, currentPiece)) {
+          hint(`提醒：${currentPiece} 方要获胜了😨`);
+        }
+
+        if (judge(pattern, currentPiece)) {
+          hint(`${currentPiece} 方胜利✌️`);
+        }
       }
 
-      function check(pattern, piece, x, y) {
-        
+      // 判断游戏是否有胜利的一方
+      function judge(pattern, piece) {
+        for (let i = 0; i < 3; i++) {
+          // 三行相同
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[i][j] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+
+          // 三列相同
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[j][i] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+
+          // 左上到右下的斜向
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[j][j] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+
+          // 左下到右上的
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[2 - j][j] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      function clone(obj) {
+        // 很消耗性能
+        return JSON.parse(JSON.stringify(obj));
+      }
+
+      function willWin(pattern, piece) {
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            if (pattern[i][j] !== 0) {
+              continue;
+            }
+            let temp = clone(pattern);
+            temp[i][j] = piece;
+            if (judge(temp, piece)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      function hint(str) {
+        hintEle.innerHTML = str;
       }
 
       render();
