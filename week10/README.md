@@ -9,5 +9,9 @@
 
 ## 作业
 
-- [TicTacToe](./tic-tac-toc.html)
+- 把所有的浏览器 API 画进脑图里：
+  - [Broswer-API](./Broswer-API.png)
+- 看完第 10 周第 2 节课程，完成 TicTacToe 的练习：
+  - [TicTacToe](./tic-tac-toc.html)
 
+- 根据第 10 周第 2 节课程内容，自己完成一个五子棋的游戏编程**（选做）**
