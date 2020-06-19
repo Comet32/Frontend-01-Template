@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>tic-tac-toc</title>
+    <style>
+      main {
+        position: relative;
+        height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      .checkerboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-content: space-between;
+        width: 30vw;
+        height: 30vw;
+      }
+      .cell {
+        width: 9.8vw;
+        height: 9.8vw;
+        background-color: #3d5a80;
+        line-height: 33%;
+        font-size: 4.5vw;
+        line-height: 10.6vw;
+        text-align: center;
+        color: #ee6c4d;
+        cursor: pointer;
+      }
+      .hint {
+        color: #293241;
+        margin-bottom: 20px;
+        font-size: 20px;
+      }
+      .info {
+        position: absolute;
+        top: 0;
+        text-align: center;
+        font-size: 30px;
+      }
+      .btn{
+        margin-top: 20px;
+      }
+      button{
+        font-size: 20px;
+      }
+      .best-choice{
+        margin-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="hint">&nbsp;</div>
+      <div class="checkerboard"></div>
+      <div class="info"><span id="piece">⭕️</span> 方回合</div>
+      <div class="btn"><button class="restart">重新开始</button><button class="best-choice">最好的选择</button><div>
+    </main>
+
+    <script>
+      const X = '❌';
+      const O = '⭕️';
+      let pattern = [0,0,0,0,0,0,0,0,0];
+      let piece = O; // 棋子的种类
+      let isEnd = false;
+
+      let board = document.querySelector('.checkerboard');
+      let hintEle = document.querySelector('.hint');
+      let pieceName = document.querySelector('#piece');
+      let restartBtn = document.querySelector('.restart');
+      let bestChoiceBtn = document.querySelector('.best-choice');
+
+      restartBtn.addEventListener('click',() => {
+        initialize();
+        render();
+      });
+
+      bestChoiceBtn.addEventListener('click',() => {
+        const {point, result} = bestChoice(pattern, piece);
+        if(point){
+          putPiece(point[1], point[0]);
+        }
+      })
+
+      function initialize(){
+        pattern = [0,0,0,0,0,0,0,0,0];
+        piece = O;
+        hint('&nbsp;')
+        pieceName.innerHTML = O;
+        isEnd = false;
+      }
+
+      function render() {
+        board.innerHTML = '';
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 3; j++) {
+              let cell = document.createElement('div');
+              cell.classList.add('cell');
+              cell.addEventListener('click', () => {
+              putPiece(i, j);
+            });
+            let str = pattern[i * 3 + j]
+            cell.innerHTML = str ? str : '';
+            board.appendChild(cell);
+            }
+         }
+      }
+
+      function putPiece(y, x) {
+        if(isEnd){
+          alert('游戏结束，请重新开始');
+          return;
+        }
+        let hasPiece = !!pattern[y * 3 + x];
+        let currentPiece = piece;
+        if (hasPiece) {
+          // alert('已有棋子');
+          return;
+        } else {
+          pattern[y * 3 + x] = piece;
+          piece = piece === X ? O : X;
+          pieceName.innerHTML = piece;
+        }
+        // 渲染 UI
+        render('&nbsp;');
+
+        // 判断是否某一方要获胜
+        if (willWin(pattern, currentPiece)) {
+          hint(`提醒：${currentPiece} 方要获胜了😨`);
+        }else{
+          hint(`&nbsp;`);
+        }
+
+        if (judge(pattern, currentPiece)) {
+          hint(`${currentPiece} 方胜利✌️`);
+          isEnd = true;
+        }
+      }
+
+      // 判断游戏是否有胜利的一方
+      function judge(pattern, piece) {
+        for (let i = 0; i < 3; i++) {
+          // 三行相同
+          {
+            // 默认认为是会赢
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[i * 3 + j] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+
+          // 三列相同
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[j * 3 + i] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+
+          // 左上到右下的斜向
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[j * 3 + j] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+
+          // 左下到右上的
+          {
+            let win = true;
+            for (let j = 0; j < 3; j++) {
+              if (pattern[(2 - j) * 3 + j] !== piece) {
+                win = false;
+                break;
+              }
+            }
+            if (win) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+
+      function clone(obj) {
+        return Object.create(obj);
+      }
+
+      function willWin(pattern, piece) {
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            if (pattern[i * 3 + j] !== 0) {
+              continue;
+            }
+            let temp = clone(pattern);
+            temp[i * 3 + j] = piece;
+            if (judge(temp, piece)) {
+              return [j, i]; // j 是 Y 轴，i 是 X 轴
+            }
+          }
+        }
+        return null;
+      }
+
+      // 棋谱
+      let manual = new Map();
+      manual.set([
+        0, 0, 0,
+        0, 0, 0,
+        0, 0, 0,
+       ].toString() + O, {
+         point: [1,1],
+         result: 0
+       })
+       manual.set([
+        0, 0, 0,
+        0, O, 0,
+        0, 0, 0,
+       ].toString() + X, {
+         point: [0,0],
+         result: 0
+       })
+
+      // 对于要下棋子那一方的最好预判，优化：可以给 pattern 添加一个 hash，如果已经搜索过这个模式，就不用搜
+      function bestChoice(pattern, piece) {
+        let key = pattern.toString() + piece; // 使用当前棋局的模型和棋方形成一个字符串 hash key
+        if(manual.get(key)){
+          return manual.get(key);
+        }
+        let point = willWin(pattern, piece);
+        // 如果有 point 说明要胜利了，这里也是递归的退出条件之一
+        if (point) {
+          return {
+            point,
+            result: 1, // -1 输 0 平 1 赢
+          };
+        }
+
+        // 默认认为自己处于最坏的情况
+        let result = -1;
+
+        // 检查棋盘中的每一个可能会走的点，并且获得对方的最好选择
+        outer: for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            if (pattern[i * 3 + j] !== 0) {
+              continue;
+            }
+            let temp = clone(pattern);
+            // 我方在某个空位下一个棋子
+            temp[i * 3 + j] = piece;
+            // 获取对手的最好选择
+            let opposite = bestChoice(temp, piece === O ? X : O); 
+            // 对手最差的结果就是我方最想要的结果，那么对 opposite.result 取反则是我方想要的情况
+            // 如果这个情况比我方现在的情况好，那么我就用这个结果
+            if (-opposite.result >= result) {
+              point = [j, i];
+              result = -opposite.result;
+            }
+            // 没有这一条等于全盘搜索，现在做成了 win lose 减枝，减少运算量 
+            if(result === 1){
+              break outer;
+            }
+          }
+        }
+
+        return {
+          point,
+          result: point ? result : 0,
+        };
+      }
+ 
+      function hint(str) {
+        hintEle.innerHTML = str;
+      }
+
+      render();
+    </script>
+  </body>
+</html>
