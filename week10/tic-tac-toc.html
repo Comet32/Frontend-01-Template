@@ -165,6 +165,7 @@
             pattern[point[1]][point[0]] = currentPiece === O ? X : O
             piece = piece === X ? O : X;
             currentPiece = currentPiece === X ? O : X;
+            pieceName.innerHTML = piece;
           }
         }
 
