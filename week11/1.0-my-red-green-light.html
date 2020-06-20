@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      main {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      div {
+        width: 30vh;
+        height: 30vh;
+        border-radius: 50%;
+        background-color: #aaa;
+        margin-right: 50px;
+      }
+      .bg-red {
+        background-color: #d64f35;
+      }
+      .bg-yellow {
+        background-color: #edc862;
+      }
+      .bg-green {
+        background-color: #93af68;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div id="red"></div>
+      <div id="yellow"></div>
+      <div id="green"></div>
+    </main>
+  </body>
+  <script>
+    let red = document.getElementById('red');
+    let yellow = document.getElementById('yellow');
+    let green = document.getElementById('green');
+
+    function cleanClassName() {
+      [red, green, yellow].forEach((ele) => (ele.className = ''));
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve();
+        }, ms);
+      });
+    }
+
+    async function changeLight() {
+      green.className = 'bg-green';
+      await sleep(5000);
+      cleanClassName();
+      yellow.className = 'bg-yellow';
+      await sleep(2000);
+      cleanClassName();
+      red.className = 'bg-red';
+      await sleep(3000);
+      cleanClassName();
+      changeLight();
+    }
+
+    changeLight();
+  </script>
+</html>

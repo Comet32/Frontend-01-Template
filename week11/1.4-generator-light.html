@@ -1,0 +1,125 @@
+<style>
+  div {
+    background-color: grey;
+    display: inline-block;
+    margin: 30px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+  .yellow.light {
+    background-color: yellow;
+  }
+  .red.light {
+    background-color: red;
+  }
+  .green.light {
+    background-color: green;
+  }
+</style>
+
+<div class="red"></div>
+<div class="yellow"></div>
+<div class="green"></div>
+<button class="next">next</button>
+<button class="stop">stop</button>
+
+<script>
+  let lights = document.querySelectorAll('div');
+  let red = document.querySelector('.red');
+  let yellow = document.querySelector('.yellow');
+  let green = document.querySelector('.green');
+  let nextBtn = document.querySelector('.next');
+  let stopBtn = document.querySelector('.stop');
+  let stopPromise = Promise.resolve();
+  let isStop = false;
+
+  stopBtn.addEventListener('click', () => {
+    if (isStop) {
+      stopPromise = Promise.resolve();
+      isStop = false;
+      return;
+    }
+    isStop = true;
+    stopPromise = new Promise(() => {});
+  });
+
+  function sleep(ms) {
+    return new Promise((resolve) =>
+      setTimeout(() => {
+        resolve();
+      }, ms),
+    );
+  }
+
+  function happen(ele, event) {
+    return new Promise((resolve) => {
+      ele.addEventListener(
+        event,
+        () => {
+          resolve();
+        },
+        { once: true },
+      );
+    });
+  }
+
+  function extinguishAll() {
+    lights.forEach((light) => light.classList.remove('light'));
+  }
+
+  function redLightUp() {
+    extinguishAll();
+    red.classList.add('light');
+  }
+
+  function yellowLightUp() {
+    extinguishAll();
+    yellow.classList.add('light');
+  }
+
+  function greenLightUp() {
+    extinguishAll();
+    green.classList.add('light');
+  }
+
+  function* g() {
+    yield 1;
+    yield 2;
+    yield 3;
+  }
+
+  async function next() {
+    while (true) {
+      greenLightUp();
+      await happen(nextBtn, 'click');
+      yellowLightUp();
+      await happen(nextBtn, 'click');
+      redLightUp();
+      await happen(nextBtn, 'click');
+    }
+  }
+
+  // 著名用于异步的库 —— co
+  function co(iterator) {
+    let { value, done } = iterator.next();
+    if (value instanceof Promise) {
+      value.then(() => {
+        co(iterator);
+      });
+    }
+  }
+
+  function* go() {
+    while (true) {
+      greenLightUp();
+      yield sleep(1000);
+      yellowLightUp();
+      yield sleep(200);
+      redLightUp();
+      yield sleep(500);
+    }
+  }
+
+  co(go());
+</script>

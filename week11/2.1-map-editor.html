@@ -1,0 +1,67 @@
+<style>
+  .cell {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: gray;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+    vertical-align: middle;
+  }
+  #container {
+    width: 701px;
+  }
+</style>
+<!-- 删除 div 之间的空白，以免出现其他节点 -->
+<div id="container"></div>
+<button onclick="localStorage.map = JSON.stringify(map)" id="save">save</button>
+<button onclick="map = new Array(10000).fill(0);render()" id="save">clearAll</button>
+<script>
+  let map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
+  let container = document.getElementById('container');
+
+  function render() {
+    container.innerHTML = '';
+    for (let y = 0; y < 100; y++) {
+      for (let x = 0; x < 100; x++) {
+        let value = map[y * 100 + x];
+        let cell = document.createElement('div');
+        if (value === 1) {
+          cell.style.backgroundColor = 'black';
+        }
+        cell.addEventListener('mouseover', () => {
+          if (mousedown) {
+            if (clear) {
+              cell.style.backgroundColor = 'grey';
+              map[y * 100 + x] = 0;
+            } else {
+              cell.style.backgroundColor = 'black';
+              map[y * 100 + x] = 1;
+            }
+          }
+        });
+        cell.classList.add('cell');
+        container.appendChild(cell);
+      }
+    }
+  }
+
+  render();
+
+  // 标志位
+  let mousedown = false;
+  let clear = false;
+  // 在 mousedown 和 mouseup 上放置一个标识位
+  // 在 document 上监听事件是为了能够实现从 map 之外点击左键滑进去
+  document.addEventListener('mousedown', (e) => {
+    mousedown = true;
+    // which 是鼠标的位置 1 2 3
+    clear = e.which === 3;
+  });
+  document.addEventListener('mouseup', () => (mousedown = false));
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  function path(map, start, end){
+    
+  }
+</script>

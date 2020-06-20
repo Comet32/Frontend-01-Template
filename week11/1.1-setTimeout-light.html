@@ -1,0 +1,62 @@
+<style>
+  div {
+    background-color: grey;
+    display: inline-block;
+    margin: 30px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+  }
+  .yellow.light {
+    background-color: yellow;
+  }
+  .red.light {
+    background-color: red;
+  }
+  .green.light {
+    background-color: green;
+  }
+</style>
+
+<div class="red"></div>
+<div class="yellow"></div>
+<div class="green"></div>
+
+<script>
+  let lights = document.querySelectorAll('div');
+  let red = document.querySelector('.red');
+  let yellow = document.querySelector('.yellow');
+  let green = document.querySelector('.green');
+
+  function extinguishAll() {
+    lights.forEach((light) => light.classList.remove('light'));
+  }
+
+  function redLightUp() {
+    extinguishAll();
+    red.classList.add('light');
+  }
+
+  function yellowLightUp() {
+    extinguishAll();
+    yellow.classList.add('light');
+  }
+
+  function greenLightUp() {
+    extinguishAll();
+    green.classList.add('light');
+  }
+
+  function go() {
+    greenLightUp();
+    setTimeout(() => {
+      yellowLightUp();
+      setTimeout(() => {
+        redLightUp();
+        setTimeout(() => {
+          go();
+        }, 3000);
+      }, 2000);
+    }, 5000);
+  }
+</script>
