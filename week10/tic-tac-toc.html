@@ -52,6 +52,9 @@
       .best-choice{
         margin-left: 20px;
       }
+      .isOpenAI{
+        margin-top: 20px;
+      }
     </style>
   </head>
   <body>
@@ -60,6 +63,10 @@
       <div class="checkerboard"></div>
       <div class="info"><span id="piece">⭕️</span> 方回合</div>
       <div class="btn"><button class="restart">重新开始</button><button class="best-choice">最好的选择</button><div>
+      <div class="isOpenAI">是否开启 AI：
+        <input type="radio" id="true" name="ai" value="true" checked><label for="true">开启</label>
+        <input type="radio" id="false" name="ai" value="false"><label for="false">关闭</label>
+      </div>
     </main>
 
     <script>
@@ -72,12 +79,14 @@
       ];
       let piece = O; // 棋子的种类
       let isEnd = false;
+      let isOpenAI = true;
 
       let board = document.querySelector('.checkerboard');
       let hintEle = document.querySelector('.hint');
       let pieceName = document.querySelector('#piece');
       let restartBtn = document.querySelector('.restart');
       let bestChoiceBtn = document.querySelector('.best-choice');
+      let radios = document.getElementsByName('ai');
 
       restartBtn.addEventListener('click',() => {
         initialize();
@@ -90,6 +99,21 @@
           putPiece(point[1], point[0]);
         }
       })
+
+      radios.forEach(radio => {
+        radio.addEventListener('change', () => {
+          getRadioValue()
+        })
+      })
+
+      function getRadioValue(){
+        for (let i = 0; i < radios.length; i++) {
+          const radio = radios[i];
+          if(radio.checked){
+            isOpenAI = radio.value === 'true' ? true : false;
+          }
+        }
+      }
 
       function initialize(){
         pattern = [
@@ -133,8 +157,19 @@
           piece = piece === X ? O : X;
           pieceName.innerHTML = piece;
         }
-        // 渲染 UI
-        render('&nbsp;');
+       
+        //AI
+        if(isOpenAI){
+          const {point, result} = bestChoice(pattern, piece);
+          if(point){
+            pattern[point[1]][point[0]] = currentPiece === O ? X : O
+            piece = piece === X ? O : X;
+            currentPiece = currentPiece === X ? O : X;
+          }
+        }
+
+         // 渲染 UI
+         render('&nbsp;');
 
         // 判断是否某一方要获胜
         if (willWin(pattern, currentPiece)) {
@@ -235,6 +270,7 @@
 
       // 棋谱
       let manual = new Map();
+      // key 为棋局+棋方的 hash 结果
       manual.set([
         [0, 0, 0],
         [0, 0, 0],
