@@ -4,7 +4,7 @@
 
 - [1.重学CSS｜CSS动画](./1.重学CSS｜CSS动画.md)
 - [2.重学HTML｜HTML语言与扩展](./2.重学HTML｜HTML语言与扩展.md)
-- [4.重学浏览器API｜DOM API，事件机制](./4.重学浏览器API｜DOM API，事件机制.md)
+- [4.重学浏览器API｜DOM-API，事件机制](./4.重学浏览器API｜DOM-API，事件机制.md)
 
 ## 作业
 
