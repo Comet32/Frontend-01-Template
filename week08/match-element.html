@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>匹配元素</title>
+    <style>
+      main h1.title {
+        color: darksalmon;
+      }
+      main section p.content {
+        border: 1px red solid;
+      }
+      aside ol li a {
+        border: 1px green solid;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section>
+        <h1 class="title" id="title">标题</h1>
+        <p class="content">文章内容</p>
+        <p>其他内容</p>
+      </section>
+      <aside>
+        <h1 class="aside-title">侧边栏标题</h1>
+        <p class="info">侧边栏介绍</p>
+        <ol>
+          <li><a href="http://baidu.com">baidu</a></li>
+          <li><a href="http://baidu.com">123</a></li>
+          <li><a href="http://baidu.com">321</a></li>
+          <li><a href="http://baidu.com">abc</a></li>
+        </ol>
+      </aside>
+    </main>
+  </body>
+  <script>
+    function match(selector, element) {
+
+      return true;
+    }
+
+    match('div #id.class', document.getElementById('title'));
+  </script>
+</html>

@@ -12,7 +12,7 @@ class Request {
     this.path = options.path || '/';
     this.body = options.body || {};
     this.headers = options.headers || {};
-    // 这里就不做驼峰转 `-` 的转换了，不过做了转换可以提高开发体验
+    // 这里就不做驼峰转 `-` 的转换了，不过做了转换可以提高开发体验，毕竟一般写对象属性的时候不会使用""
     if (!this.headers['Content-Type']) {
       this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
@@ -38,39 +38,40 @@ ${Object.keys(this.headers)
 ${this.bodyText}`;
   }
 
-  send(client) {
+  send(connection) {
     return new Promise((resolve, reject) => {
       const parser = new ResponseParser();
-      if (client) {
-        client.write(this.toString());
+
+      if (connection) {
+        connection.write(this.toString());
       } else {
-        client = net.createConnection(
+        connection = net.createConnection(
           {
             host: this.host,
             port: this.port,
           },
           () => {
-            client.write(this.toString());
+            connection.write(this.toString());
           },
         );
       }
-      // 由于 TCP 连接返回的数据的流式数据，所以并不知道此 data 是否为完整的 response
+      // 由于 TCP 连数接返回的数据是流式数据，所以并不知道此 data 是否为完整的 response
       // 因为当数据量过大时会将其拆分为多个包进行连续性的发送
       // 所以，我不能直接在此事件方法中接受 data 并将其作为完整的响应数据返回给客户端
       // 我们通过一个 ResponseParse 类来做解析和拼接
-      client.on('data', (data) => {
+      connection.on('data', (data) => {
         parser.receive(data.toString()); // 将数据喂给 parser
         if (parser.isFinished) {
           resolve(parser.response);
         }
         console.log('parser.statusLine ===', parser.statusLine);
         console.log('parser.headers ===', parser.headers);
-        client.end();
+        connection.end();
       });
 
-      client.on('error', (err) => {
+      connection.on('error', (err) => {
         reject(err);
-        client.end();
+        connection.end();
       });
     });
   }
@@ -81,7 +82,7 @@ class Response {}
 // 处理字符流
 class ResponseParser {
   constructor() {
-    // 规定一些状态
+    // 规定一些状态和默认成员值
     this.WAITING_STATUS_LINE = 0;
     this.WAITING_STATUS_LINE_END = 1;
     this.WAITING_HEADER_NAME = 2;
@@ -245,6 +246,8 @@ void (async function () {
   console.log('response', response);
   const dom = parser.parseHTML(response.body);
 })();
+
+
 
 // const client = net.createConnection({ host: '127.0.0.1', port: 8088 }, () => {
 //   // 'connect' listener.
