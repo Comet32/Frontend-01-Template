@@ -1,3 +1,4 @@
 # 每周总结可以写在这里
 
-请查看 README 
+请参考 [README](./README.md)
+
