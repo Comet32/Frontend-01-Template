@@ -1,0 +1,111 @@
+<style>
+  .cell {
+    width: 6px;
+    height: 6px;
+    background-color: gray;
+    border-bottom: solid 1px white;
+    border-right: solid 1px white;
+  }
+  #container {
+    width: 701px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+</style>
+<!-- 删除 div 之间的空白，以免出现其他节点 -->
+<div id="container"></div>
+<button onclick="localStorage.map = JSON.stringify(map)" id="save">save</button>
+<button onclick="map = new Array(10000).fill(0);render()" id="save">clearAll</button>
+<script>
+  let map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
+  let container = document.getElementById('container');
+
+  function sleep(ms) {
+    return new Promise((resolve, reject) => setTimeout(resolve, ms));
+  }
+
+  function render() {
+    container.innerHTML = '';
+    for (let y = 0; y < 100; y++) {
+      for (let x = 0; x < 100; x++) {
+        let value = map[y * 100 + x];
+        let cell = document.createElement('div');
+        if (value === 1) {
+          cell.style.backgroundColor = 'black';
+        }
+        cell.addEventListener('mouseover', () => {
+          if (mousedown) {
+            if (clear) {
+              cell.style.backgroundColor = 'grey';
+              map[y * 100 + x] = 0;
+            } else {
+              cell.style.backgroundColor = 'black';
+              map[y * 100 + x] = 1;
+            }
+          }
+        });
+        cell.classList.add('cell');
+        container.appendChild(cell);
+      }
+    }
+  }
+
+  render();
+
+  // 标志位
+  let mousedown = false;
+  let clear = false;
+  // 在 mousedown 和 mouseup 上放置一个标识位
+  // 在 document 上监听事件是为了能够实现从 map 之外点击左键滑进去
+  document.addEventListener('mousedown', (e) => {
+    mousedown = true;
+    // which 是鼠标的位置 1 2 3
+    clear = e.which === 3;
+  });
+  document.addEventListener('mouseup', () => (mousedown = false));
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+  async function findPath(map, start, end) {
+    // 广度优先搜索会使用到队列
+    let queue = [start];
+
+    async function insert([x, y]) {
+      map = map.slice();
+      // 如果非 0 则不添加，非 0 有两种情况，1.该格子是我们所画的障碍物；2.此格子已经走过
+      if (map[100 * y + x] !== 0) {
+        return;
+      }
+      // 如果超出了边界则不添加
+      if (x < 0 || y < 0 || x >= 100 || y >= 100) {
+        return;
+      }
+      // 已经走过的格子,添加状态 2
+      map[100 * y + x] = 2;
+      container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
+      await sleep(500);
+      queue.push([x, y]);
+    }
+    // 白格有三种状态：1.未知 2.走到（紫色） 3.能否继续走（蓝色），过程：白->紫->蓝
+    // 将紫色格放入队列，然后再依次将这些格展开就可以了
+    while (queue.length) {
+      // 队列的特点是一侧入队，另一侧出队，所有有两组 API 选择：1.pop unshift 2.push shift
+      let [x, y] = queue.shift();
+      // 偷懒牺牲性能
+      // 找到终点的时候
+      console.log('[x,y]', [x, y]);
+      if (x === end[0] && y === end[1]) {
+        container.children[y * 100 + x].style.backgroundColor = 'red'
+        return true;
+      }
+      // 要将起始点的紫色格子变蓝就要去找它上下左右的格子是否能走
+      // 有三种情况不能走：1.有障碍 2. x y 如果小于 0 大于 100 超过的边界不能走 3.走过的路
+      // 注意：如果这里不添加 await，则会变成同步代码
+       await insert([x - 1, y]);
+       await insert([x + 1, y]);
+       await insert([x, y - 1]);
+       await insert([x, y + 1]);
+    }
+    // 没有找到
+    return false;
+  }
+</script>
