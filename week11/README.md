@@ -11,4 +11,5 @@
 - 完成路径编辑器
   - [2.1-map-editor](./2.1-map-editor.html)
 - 完成课上布置的练习，并将编程训练的寻路完成
+  - [3.3-findPath-a-search](./3.3-findPath-a-search.html)
 
