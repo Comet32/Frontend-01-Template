@@ -17,9 +17,9 @@
 <button onclick="localStorage.map = JSON.stringify(map)" id="save">save</button>
 <button onclick="map = new Array(10000).fill(0);render()" id="save">clearAll</button>
 <script>
-  // 无序数组
-  // 利用这个数组来决定之后启发搜索的顺序
-  class Sorted {
+
+  // 二叉堆
+  class BinaryHeap {
     // 可以参考 sort 函数
     constructor(data, compare) {
       this.data = data;
@@ -28,25 +28,37 @@
 
     // 取一个数组中最小的值
     take() {
-      // 寻找一个最小值，最小的时间复杂度大O 是 On；排序 sort 的时间复杂度是 O * logn，所以不行
       if (!this.data.length) {
-        // 这里 return undefined 的原因是 data 数组中当都 pop 出去之后也会返回 undefined
         return;
       }
+      // 取根节点
       let min = this.data[0];
-      let minIndex = 0;
-      // 很常规的获取最小值的方法，遍历对比
-      for (let i = 1; i < this.data.length; i++) {
-        // 这里需要和 sort 方法一致
-        // 提供 compare 方法的好处在于，可以自定义比较的过程
-        if (this.compare(this.data[i], min) < 0) {
-          min = this.data[i];
-          minIndex = i;
+      let i = 0;
+      // 修补堆
+      while(i < this.data.length){
+        // 处理边界情况
+        // 两个子节点都没有
+        if(i * 2 + 1 >= this.data.length){
+          break;
         }
+        // 没有右节点
+        if(i * 2 + 2 >= this.data.length){
+          i = i * 2 + 1;
+          break;
+        } 
+  
+        // 每一个父节点的两个子节点为 i * 2 + 1; i * 2 + 2;
+        let left = this.data[i * 2 + 1];
+        let right = this.data[i * 2 + 2];
+        if(this.compare(left, right) < 0){
+          this.data[i] = left;
+          i = i * 2 + 1;
+        }else{
+          this.data[i] = right;
+          i = i * 2 + 2;
+        }
+
       }
-      // 删除最小值
-      this.data[minIndex] = this.data[this.data.length - 1];
-      this.data.pop();
       return min;
     }
 
