@@ -1,0 +1,146 @@
+<script>
+  let regexp = /([0-9\.]+)|([ ]+)|([\r\n]+)|(\+)|(\-)|(\*)|(\/)/g;
+
+  let dictionary = ['Number', 'Whitespace', 'LineTerminator', '+', '-', '*', '/'];
+
+  function* tokenize(source) {
+    let result = null;
+    let lastIndex = 0;
+
+    while (true) {
+      // 匹配
+      lastIndex = regexp.lastIndex;
+      result = regexp.exec(source);
+
+      // 判断匹配的结果
+      if (!result) break;
+
+      // 报错处理 —— 出现非预期 token
+      if (regexp.lastIndex - lastIndex > result[0].length) {
+        let unexpectedToken = source.slice(lastIndex, regexp.lastIndex - result[0].length);
+        throw new Error(`Unexpected token ${unexpectedToken}!`);
+      }
+
+      // 生成 token
+      let token = {
+        type: null,
+        value: null,
+      };
+
+      for (let i = 1; i <= dictionary.length; i++) {
+        if (result[i]) {
+          token.type = dictionary[i - 1];
+        }
+      }
+
+      token.value = result[0];
+
+      yield token;
+    }
+
+    yield { type: 'EOF' }; // End Of File
+  }
+
+  // LL 写法，识别每种结构的函数，每种产生式对应一个函数
+  // LL 的处理方式可以是由小到大，这里最小的产生式函数是 MultiplicativeExpression
+  function Expression(tokens) {
+    if(source[0].type === "AdditiveExpression" && source[1].type === "EOF"){
+      let node = {
+        type: 'Expression',
+        children: [source.shift(), source.shift()]
+      }
+      source.unshift(node);
+      return node;
+    }
+    AdditiveExpression(source);
+    return Expression(source);
+  }
+
+  function AdditiveExpression(source) {
+    if (source[0].type === 'Number') {
+      MultiplicativeExpression(source);
+      return AdditiveExpression(source);
+    }
+
+    if (source[0].type === 'MultiplicativeExpression') {
+      let node = {
+        type: 'AdditiveExpression',
+        children: [source.shift()],
+      };
+      source.unshift(node);
+      return AdditiveExpression(source);
+    }
+
+    if (source[0].type === 'AdditiveExpression' && source.length > 1 && source[1].type === '+') {
+      let node = {
+        type: 'AdditiveExpression',
+        children: [source.shift(), source.shift()],
+      };
+      // 非终结符还需要调用一次乘法的产生式，产生 MultiplicativeExpression
+      MultiplicativeExpression(source);
+      node.children.push(source.shift());
+      source.unshift(node);
+      return AdditiveExpression(source);
+    }
+
+    if (source[0].type === 'AdditiveExpression' && source.length > 1 && source[1].type === '-') {
+      let node = {
+        type: 'AdditiveExpression',
+        children: [source.shift(), source.shift()],
+      };
+      // 非终结符还需要调用一次乘法的产生式，产生 MultiplicativeExpression
+      MultiplicativeExpression(source);
+      node.children.push(source.shift());
+      source.unshift(node);
+      return AdditiveExpression(source);
+    }
+
+    if (source[0].type === 'AdditiveExpression') return source[0];
+
+    throw new Error();
+  }
+
+  function MultiplicativeExpression(source) {
+    // 如果是一开始的 token 是 Number 则产生一个 MultiplicativeExpression
+    if (source[0].type === 'Number') {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: [source.shift()],
+      };
+      source.unshift(node);
+      return MultiplicativeExpression(source);
+    }
+    // 如果 source[0] 是 MultiplicativeExpression 并且 source[1] 的 token 类型是 * 则将消耗三个 token 产生一个 MultiplicativeExpression，因为 * 的后面必然是一个 Number
+    if (source[0].type === 'MultiplicativeExpression' && source.length > 1 && source[1].type === '*') {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: [source.shift(), source.shift(), source.shift()],
+      };
+      source.unshift(node);
+      return MultiplicativeExpression(source);
+    }
+    // 如上同理，只是 token 换成为了 `/`
+    if (source[0].type === 'MultiplicativeExpression' && source.length > 1 && source[1].type === '/') {
+      let node = {
+        type: 'MultiplicativeExpression',
+        children: [source.shift(), source.shift(), source.shift()],
+      };
+      source.unshift(node);
+      return MultiplicativeExpression(source);
+    }
+    if (source[0].type === 'MultiplicativeExpression') return source[0];
+
+    throw new Error();
+  }
+
+  let source = [];
+
+  for (let token of tokenize('5 + 1024 * 2')) {
+    if (token.type !== 'Whitespace' && token.type !== 'LineTerminator') {
+      source.push(token);
+    }
+  }
+
+  let re = Expression(source);
+  console.log('re', re);
+</script>

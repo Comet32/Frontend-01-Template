@@ -10,7 +10,7 @@
 <pre id="container"></pre>
 
 <script>
-  let source = `function sleep(t){
+  let source = `～～～function sleep(t){
       return new Promise(function(resolve){
           setTimeout(resolve, t);
       });
@@ -29,6 +29,12 @@
     lastIndex = regexp.lastIndex;
     token = regexp.exec(source);
     if (!token) break;
+
+    if(regexp.lastIndex - lastIndex > token[0].length){
+      let unexpectedToken = source.slice(lastIndex, regexp.lastIndex - token[0].length);
+      throw new Error(`Unexpected token ${unexpectedToken}!`);
+    }
+
     let text = document.createElement('span');
     text.textContent = token[0];
 
