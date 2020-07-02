@@ -1,0 +1,63 @@
+<script>
+  // 字典树
+  class Trie {
+    constructor() {
+      // 这里使用 Map 是最好的，因为存数组的空间比较大，而 Map 会存的比较紧凑一些，取决于 Map 的实现。
+      // 而这里使用了 Object 是因为 winter 准备的代码是 Object，不过和 Map 也差不多，也是可以用 string 来作为 key
+      this.root = Object.create(null);
+    }
+
+    insert(word) {
+      let node = this.root;
+      // 将单词的每个字母作为树的分支属性保存
+      for (let c of word) {
+        // 没有这个分支就创建这个分支
+        if (!node[c]) {
+          node[c] = Object.create(null);
+        }
+        // 让当前分支 node 的位置移动到当前字母的分支
+        node = node[c];
+      }
+      // 接着我们需要处理结束，比如 'ca' 或者 'cad' 在字符串的最后实际隐含有一个像是正则中的 `$` 符号的意思，也就是结束
+      // 这里我们手动的给单词的最后节点添加一个 '$'，并且用 '$' 属性来表示此 word 出现的次数，因为会有重复的情况
+      if (!('$' in node)) {
+        node['$'] = 0;
+      }
+      node['$']++;
+    }
+
+    // 获取数量最多的字符串
+    most() {
+      let max = 0;
+      let maxWord = null;
+      // 用于递归的访问每个节点
+      let visit = (node, word) => {
+        if(node.$ && node.$ > max) {
+          max = node.$;
+          maxWord = word;
+        }
+        // 如果树的数组结构是由 Map 来实现则可以使用 for of
+        for(let p in node){
+          visit(node[p], word + p);
+        }
+      }
+      visit(this.root, "");
+      console.log('maxWord', maxWord);
+    }
+
+  }
+
+  function randomWord(length) {
+    let str = '';
+    for (let i = 0; i < length; i++) {
+      str += String.fromCharCode(Math.random() * 26 + 'a'.charCodeAt(0));
+    }
+    return str;
+  }
+
+  let trie = new Trie();
+  // 插入长度为 4 的 word 10000 次形成一棵比较大的 trie 树
+  for (let i = 0; i < 10000; i++) {
+    trie.insert(randomWord(4));
+  }
+</script>

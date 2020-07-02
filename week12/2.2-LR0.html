@@ -1,0 +1,42 @@
+<script>
+  function parse(source) {
+    let stack = [];
+
+    for (let c of source) {
+      if (c === '(' || c === '[' || c === '{') {
+        stack.push(c);
+        continue;
+      }
+
+      if (c === ')') {
+        if (stack[stack.length - 1] === '(') {
+          // pop 这个运算相当于合并出一个新节点
+          stack.pop();
+        }else{
+          return false;
+        }
+      }
+      if (c === ']') {
+        if (stack[stack.length - 1] === '[') {
+          stack.pop();
+        }else{
+          return false;
+        }
+      }
+      if (c === '}') {
+        if (stack[stack.length - 1] === '{') {
+          stack.pop();
+        }else{
+          return false;
+        }
+      }
+    }
+    // 要保证遍历完字符串之后再来检查一下是否完全匹配
+    // 因为匹配到后括号则会 pop，所以当括号能够完全匹配时，则 stack 的长度为 0
+    if(stack.length === 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+</script>

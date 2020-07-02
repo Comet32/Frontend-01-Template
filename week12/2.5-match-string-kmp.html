@@ -1,0 +1,39 @@
+<script>
+  function find(source, pattern) {
+    // table 是用于存储 pattern 回溯到的 index 的值的
+    let table = new Array(pattern.length).fill(0);
+
+    // k 是指模式串所回到的索引位置
+    let k = 0;
+
+    for(let j = 1; j < pattern.length; j++){
+      if(pattern[j] === pattern[k]){
+        k++;
+      } else{
+        k = 0;
+      }
+      table[j] = k;
+    }
+    
+    let j = 0;
+    for (let i = 0; i < source.length; i++) {
+      if(source[i] === pattern[j]){
+        j++ 
+      } else {
+        while(source[i] !== pattern[j] && j > 0){
+          j = table[j -1];
+        }
+        if(source[i] === pattern[j]){
+          j++;
+        } else{
+          j = 0;
+        }
+      }
+
+      if(j === pattern.length){
+        return true;
+      }
+    }
+    return false;
+  }
+</script>
