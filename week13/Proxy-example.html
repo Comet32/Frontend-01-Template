@@ -1,0 +1,119 @@
+<input id="text" type="text" /> <br />
+
+<input id="r" type="range" min="0" max="255" /> <br />
+<input id="g" type="range" min="0" max="255" /> <br />
+<input id="b" type="range" min="0" max="255" /> <br />
+
+<div id="color" style="width: 200px; height: 200px;"></div>
+
+<script>
+  // 使用 map 来存储不同对象的 effect，好处是可以用 obj 作为 key
+  const handlerMap = new Map();
+
+  // 存放代理对象时所返回的对象，用于检验对象是否被代理，从而节省性能
+  let reactivities = new Map();
+
+  let usedReactivities = [];
+
+  const object = {
+    a: 1,
+    b: 2,
+    c: {
+      d: 'jie',
+    },
+    r: 100,
+  };
+
+  function reactive(obj) {
+    // 解决重复代理的问题，否则每一次 obj 的 get 都有可能对其 Object 的属性进行代理
+    if (reactivities.has(obj)) {
+      return reactivities.get(obj);
+    }
+
+    let proxy = new Proxy(obj, {
+      get(obj, prop) {
+        usedReactivities.push([obj, prop]);
+        // 如果属性是对象，则将其传入 reactive 进行代理
+        if (typeof obj[prop] === 'object') {
+          // 返回被代理之后的对象
+          return reactive(obj[prop]);
+        }
+        return obj[prop];
+      },
+      set(obj, prop, val) {
+        obj[prop] = val;
+        if (handlerMap.get(obj)) {
+          if (handlerMap.get(obj).get(prop)) {
+            for (let handler of handlerMap.get(obj).get(prop)) {
+              handler();
+            }
+          }
+        }
+        return obj[prop];
+      },
+    });
+
+    reactivities.set(obj, proxy);
+
+    return proxy;
+  }
+
+  function effect(handler) {
+    usedReactivities = [];
+    handler();
+    for (let usedReactivity of usedReactivities) {
+      let [obj, prop] = usedReactivity;
+      console.log({ obj, prop });
+      // 如果没有以 obj 为 key 的 map 则创建一个
+      if (!handlerMap.get(obj)) {
+        handlerMap.set(obj, new Map());
+      }
+      if (!handlerMap.get(obj).has(prop)) {
+        // effect 是存储在以对象为 key 的 map 中的以属性为 key 的数组中，这样就可以在 set 时只执行与此属性有关的 effect，节省性能
+        handlerMap.get(obj).set(prop, []);
+      }
+      handlerMap.get(obj).get(prop).push(handler);
+    }
+  }
+
+  let dummy;
+
+  // 将 object 包装为 proxy 对象
+  let proxy = reactive({ r: 0, g: 0, b: 0 });
+
+  // effect(() => (dummy = proxy.c.d));
+  // console.log('prev | dummy:', dummy);
+  // proxy.c.d = 'bao';
+  // console.log('later | dummy:', dummy);
+
+  effect(() => {
+    let { r, g, b } = proxy;
+    document.getElementById('text').value =`${r},${g},${b}`;
+  });
+
+  ['r', 'g', 'b'].forEach((id) => {
+    let ele = document.getElementById(id);
+
+    effect(() => {
+      ele.value = proxy[id];
+    });
+
+    ele.addEventListener('input', (event) => {
+      proxy[id] = event.target.value;
+    });
+
+  });
+
+  effect(() => {
+    let { r, g, b } = proxy;
+    document.getElementById('color').style.backgroundColor = `rgb(${r},${g},${b})`;
+  });
+
+  document.getElementById('text').addEventListener('input', (event) => {
+    let colors = event.target.value.split(',');
+    proxy.r = colors[0];
+    proxy.g = colors[1];
+    proxy.b = colors[2];
+    console.log('proxy', proxy);
+  });
+</script>
