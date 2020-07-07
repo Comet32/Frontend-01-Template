@@ -1,0 +1,84 @@
+<style>
+  body {
+    margin: 0;
+  }
+</style>
+<div id="container">
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+  文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字 文字
+</div>
+<div id="dragable" style="width: 100px; height: 100px; background-color: pink; display: inline-block;"></div>
+<script>
+  let dragable = document.getElementById('dragable');
+
+  let baseX = 0;
+  let baseY = 0;
+
+  dragable.addEventListener('mousedown', (event) => {
+    let handleSelectstart = (event) => event.preventDefault();
+    // 去掉鼠标框选文字
+    document.addEventListener('selectstart', handleSelectstart);
+    // event 中有很多表示鼠标位置的值，推荐使用 `clientX` 和 `clientY`，相当于可视区域的坐标，非常准确并且没有歧义，和浏览器窗口里面的可渲染区域一一对应。
+    // 点击鼠标时开始位置
+    let startX = event.clientX;
+    let startY = event.clientY;
+    let move = (event) => {
+      let range = nearest(event.clientX, event.clientY);
+      range.insertNode(dragable);
+      // 移动量
+      // let moveX = event.clientX - startX;
+      // let moveY = event.clientY - startY;
+      // let x = baseX + moveX;
+      // let y = baseY + moveY;
+      // dragable.style.transform = `translate(${x}px,${y}px)`;
+    };
+    let up = (event) => {
+      // 放开鼠标时的结束位置
+      let endX = event.clientX;
+      let endY = event.clientY;
+      baseX = baseX + endX - startX;
+      baseY = baseY + endY - startY;
+      document.removeEventListener('mousemove', move);
+      document.removeEventListener('mouseup', up);
+      document.removeEventListener('selectstart', handleSelectstart);
+    };
+
+    document.addEventListener('mousemove', move);
+
+    document.addEventListener('mouseup', up);
+  });
+
+  let ranges = [];
+
+  let container = document.getElementById('container');
+  for (i = 0; i < container.childNodes[0].textContent.length; i++) {
+    let range = document.createRange();
+    // 选择文字之间的缝隙
+    range.setStart(container.childNodes[0], i);
+    range.setEnd(container.childNodes[0], i);
+    ranges.push(range);
+  }
+
+  // 获取能够拖进去的位置，离当前鼠标位置最近的 range
+  function nearest(x0, y0) {
+    let nearestRange = null;
+    // 初始距离设置为 Infinity，这样当有距离的时候就会比 distance 小（这也是一个常见技巧，当我们找最小值的时候，就可以将初始值设为正无穷，找最大值的时候就将其设置为负无穷）
+    let distance = Infinity;
+    for (let range of ranges) {
+      // range 也可以获取元素的大小位置信息
+      let { x, y } = range.getBoundingClientRect();
+      let d = (x0 - x) ** 2 + (y0 - y) ** 2; // 计算直线距离应该是要开平方的，但是开平方并不影响比较大小，所以就没有开
+
+      if (d < distance) {
+        nearestRange = range;
+        distance = d;
+      }
+    }
+    return nearestRange;
+  }
+</script>
