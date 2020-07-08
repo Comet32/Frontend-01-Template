@@ -39,7 +39,7 @@
 #作业&总结链接:https://github.com/Comet32/Frontend-01-Template/tree/master/week05
 ```
 
-
+- 作业提交地址：https://github.com/GeekUniversity/Frontend-01-Template/issues
 
 
 
