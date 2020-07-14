@@ -1,0 +1,96 @@
+<img
+  id="catImg"
+  src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80"
+  width="400"
+/>
+<img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80" alt="">
+<div>点击次数 <span id="number">0</span></div>
+
+<script>
+  // 使用 map 来存储不同对象的 effect，好处是可以用 obj 作为 key
+  const handlerMap = new Map();
+
+  // 存放代理对象时所返回的对象，用于检验对象是否被代理，从而节省性能
+  let reactivities = new Map();
+
+  let usedReactivities = [];
+
+  const object = {]
+    a: 1,
+    b: 2,
+    c: {
+      d: 'jie',
+    },
+    r: 100,
+  };
+
+  function reactive(obj) {
+    // 解决重复代理的问题，否则每一次 obj 的 get 都有可能对其 Object 的属性进行代理
+    if (reactivities.has(obj)) {
+      return reactivities.get(obj);
+    }
+
+    let proxy = new Proxy(obj, {
+      get(obj, prop) {
+        usedReactivities.push([obj, prop]);
+        // 如果属性是对象，则将其传入 reactive 进行代理
+        if (typeof obj[prop] === 'object') {
+          // 返回被代理之后的对象
+          return reactive(obj[prop]);
+        }
+        return obj[prop];
+      },
+      set(obj, prop, val) {
+        obj[prop] = val;
+        if (handlerMap.get(obj)) {
+          if (handlerMap.get(obj).get(prop)) {
+            for (let handler of handlerMap.get(obj).get(prop)) {
+              handler();
+            }
+          }
+        }
+        return obj[prop];
+      },
+    });
+
+    reactivities.set(obj, proxy);
+
+    return proxy;
+  }
+
+  function effect(handler) {
+    usedReactivities = [];
+    handler();
+    for (let usedReactivity of usedReactivities) {
+      let [obj, prop] = usedReactivity;
+      console.log({ obj, prop });
+      // 如果没有以 obj 为 key 的 map 则创建一个
+      if (!handlerMap.get(obj)) {
+        handlerMap.set(obj, new Map());
+      }
+      if (!handlerMap.get(obj).has(prop)) {
+        // effect 是存储在以对象为 key 的 map 中的以属性为 key 的数组中，这样就可以在 set 时只执行与此属性有关的 effect，节省性能
+        handlerMap.get(obj).set(prop, []);
+      }
+      handlerMap.get(obj).get(prop).push(handler);
+    }
+  }
+
+  let cat = document.getElementById('catImg');
+  let num = document.getElementById('number');
+  let proxy = reactive({ number: 0 });
+  cat.addEventListener('click', () => {
+    proxy.number++;
+  });
+  cat.addEventListener('mouseover',() => {
+    console.log('mouseover')
+    cat.src = 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80';
+  })
+  cat.addEventListener('mouseout',() => {
+    console.log('mouseout')
+    cat.src = 'https://images.unsplash.com/photo-1543852786-1cf6624b9987?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80'
+  })
+  effect(() => {
+    num.textContent = proxy.number;
+  });
+</script>
