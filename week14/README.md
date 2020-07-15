@@ -11,4 +11,4 @@
   - [component-project](./component-project)
   - [carousel](./carousel.html)
 - 为轮播组件添加鼠标操作
-  - [createElement](./component-project/createElement.js) 133~196 行
+  - [createElement](https://github.com/Comet32/Frontend-01-Template/blob/master/week14/component-project/createElement.js#L133) 133~196 行
