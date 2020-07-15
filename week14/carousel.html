@@ -1,0 +1,158 @@
+<html>
+  <head>
+    <title>carousel component</title>
+    <style>
+      .carousel {
+        width: 500px;
+        height: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        outline: solid 1px salmon;
+        margin: auto;
+      }
+      .carousel > img {
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+        transition: 1s ease transform;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container"></div>
+
+    <script>
+      class Carousel {
+        constructor() {
+          // 表示这个组件会有这两个属性
+          this.root = null;
+          this.data = null;
+        }
+        // 处理逻辑
+        render() {
+          this.root = document.createElement('div');
+          this.root.classList.add('carousel');
+
+          for (const d of this.data) {
+            let element = document.createElement('img');
+            element.src = d;
+            // 禁用浏览器默认的 img 的拖拽事件
+            element.addEventListener('dragstart', (e) => e.preventDefault());
+            this.root.appendChild(element);
+          }
+
+          let position = 0;
+
+          let nextPic = () => {
+            // 这里利用取余让 position 只在 0 ~ this.data.length - 1 之间自增1并循环
+            let nextPosition = (position + 1) % this.data.length;
+
+            let current = this.root.childNodes[position];
+            let next = this.root.childNodes[nextPosition];
+
+            current.style.transition = 'ease 0s';
+            next.style.transition = 'ease 0s';
+
+            // 起始位置
+            current.style.transform = `translateX(${-100 * position}%)`;
+            next.style.transform = `translateX(${-100 * nextPosition + 100}%)`;
+
+            setTimeout(() => {
+              current.style.transition = ''; // means use css rule
+              next.style.transition = '';
+
+              // 终止位置
+              current.style.transform = `translateX(${-100 * position - 100}%)`;
+              next.style.transform = `translateX(${-100 * nextPosition}%)`;
+              position = nextPosition;
+            }, 16);
+
+            setTimeout(nextPic, 3000);
+          };
+          setTimeout(nextPic, 3000);
+
+          this.root.addEventListener('mousedown', (event) => {
+            // event 中有很多表示鼠标位置的值，推荐使用 `clientX` 和 `clientY`，相当于可视区域的坐标，非常准确并且没有歧义，和浏览器窗口里面的可渲染区域一一对应。
+            // 点击鼠标时开始位置
+            let startX = event.clientX;
+            let { width } = this.root.getBoundingClientRect();
+
+            // 由于 `position - 1` 可能会出现负数，这样我们便无法获取 `childNodes` 中的元素，因此加上一个 length 来避免这样的问题
+            let prevPos = (position - 1 + this.data.length) % this.data.length;
+            let nextPos = (position + 1) % this.data.length;
+
+            let prev = this.root.childNodes[prevPos];
+            let current = this.root.childNodes[position];
+            let next = this.root.childNodes[nextPos];
+
+            let move = (event) => {
+              // 拖动瞬间的基本位置值
+              let prevBase = -width * prevPos - width;
+              let currentBase = -width * position;
+              let nextBase = -width * nextPos + width;
+
+              prev.style.transition = 'ease 0s';
+              current.style.transition = 'ease 0s';
+              next.style.transition = 'ease 0s';
+
+              prev.style.transform = `translateX(${prevBase}px)`;
+              current.style.transform = `translateX(${currentBase}px)`;
+              next.style.transform = `translateX(${nextBase}px)`;
+
+              // 移动量
+              let moveX = event.clientX - startX;
+              let x = moveX;
+              prev.style.transform = `translateX(${prevBase + x}px)`;
+              current.style.transform = `translateX(${currentBase + x}px)`;
+              next.style.transform = `translateX(${nextBase + x}px)`;
+            };
+
+            let up = (event) => {
+              // 偏移量，相对于视觉上图像的编译量
+              let offset = 0;
+              if (event.clientX - startX > width / 2) {
+                offset = 1;
+              } else if (event.clientX - startX < -width / 2) {
+                offset = -1;
+              }
+
+              // 添加动画
+              prev.style.transition = '';
+              current.style.transition = '';
+              next.style.transition = '';
+
+              prev.style.transform = `translateX(${-width * (prevPos - offset) - width}px)`;
+              current.style.transform = `translateX(${-width * (position - offset)}px)`;
+              next.style.transform = `translateX(${-width * (nextPos - offset) + width}px)`;
+
+              position = (position - offset + this.data.length) % this.data.length;
+
+              document.removeEventListener('mousemove', move);
+              document.removeEventListener('mouseup', up);
+            };
+
+            document.addEventListener('mousemove', move);
+
+            document.addEventListener('mouseup', up);
+          });
+        }
+      }
+
+      // 设计使用代码
+      let carousel = new Carousel();
+      let container = document.getElementById('container');
+
+      carousel.data = [
+        'https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg',
+        'https://static001.geekbang.org/resource/image/1b/21/1b809d9a2bdf3ecc481322d7c9223c21.jpg',
+        'https://static001.geekbang.org/resource/image/b6/4f/b6d65b2f12646a9fd6b8cb2b020d754f.jpg',
+        'https://static001.geekbang.org/resource/image/73/e4/730ea9c393def7975deceb48b3eb6fe4.jpg',
+      ];
+      //update
+      carousel.render();
+
+      //mount
+      container.appendChild(carousel.root);
+    </script>
+  </body>
+</html>

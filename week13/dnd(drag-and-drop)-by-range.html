@@ -20,8 +20,8 @@
   let baseY = 0;
 
   dragable.addEventListener('mousedown', (event) => {
-    let handleSelectstart = (event) => event.preventDefault();
     // 去掉鼠标框选文字
+    let handleSelectstart = (event) => event.preventDefault();
     document.addEventListener('selectstart', handleSelectstart);
     // event 中有很多表示鼠标位置的值，推荐使用 `clientX` 和 `clientY`，相当于可视区域的坐标，非常准确并且没有歧义，和浏览器窗口里面的可渲染区域一一对应。
     // 点击鼠标时开始位置
