@@ -1,0 +1,36 @@
+<style>
+  #el {
+    width: 100px;
+    height: 100px;
+    background-color: skyblue;
+  }
+</style>
+
+<div id="el"></div>
+<button id="start">Start</button>
+<button id="pause">Pause</button>
+<button id="resume">Resume</button>
+
+<script type="module">
+  import { Timeline, Animation } from './animation.js';
+  import { cubicBezier } from './cubicBezier.js';
+
+  let el = document.getElementById('el');
+  let btnStart = document.getElementById('start');
+  let btnPause = document.getElementById('pause');
+  let btnResume = document.getElementById('resume');
+  
+  let tl = new Timeline();
+
+  btnStart.addEventListener('click', () => tl.start());
+  btnPause.addEventListener('click', () => tl.pause());
+  btnResume.addEventListener('click', () => tl.resume());
+
+  // 动画函数
+  let linear = (t) => t;
+  let ease = cubicBezier(0.25, 1, 0.25, 1);
+
+  tl.add(new Animation(el.style, 'transform', (v) => `translateX(${v}px)`, 0, 500, 3000, 0, linear));
+
+  tl.start();
+</script>

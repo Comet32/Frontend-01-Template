@@ -1,0 +1,23 @@
+<style>
+  div {
+    width: 100px;
+    height: 100px;
+    background-color: lightgreen;
+    transition: 5s all ease;
+  }
+</style>
+
+<div></div>
+
+<script>
+  let ele = document.querySelector('div');
+  function start(){
+    ele.style.transform = 'translate(300px, 300px)';
+  }
+
+  function stop(){
+    ele.style.transition = 'none';
+    let {transform} = getComputedStyle(ele);
+    ele.style.transform = transform;
+  }
+</script>

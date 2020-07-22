@@ -1,5 +1,4 @@
-import { createElement, Text, Wrapper } from './createElement.js'; // 这里看到没有调用的透明变量是 VSC 给我们的提示，其实是调用了的。
-import { Carousel } from './carousel.vue';
+import { createElement, Text, Wrapper, Carousel } from './createElement.js';
 
 let imgUrls = [
   'https://static001.geekbang.org/resource/image/bb/21/bb38fb7c1073eaee1755f81131f11d21.jpg',

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h1>header One</h1>
     <img />
   </div>
 </template>
