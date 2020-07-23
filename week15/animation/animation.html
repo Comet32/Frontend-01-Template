@@ -4,33 +4,51 @@
     height: 100px;
     background-color: skyblue;
   }
+  #el2 {
+    width: 100px;
+    height: 100px;
+    background-color: lightslategrey;
+  }
 </style>
 
 <div id="el"></div>
+<div id="el2"></div>
+<hr />
 <button id="start">Start</button>
 <button id="pause">Pause</button>
 <button id="resume">Resume</button>
+<button id="restart">Restart</button>
+<hr />
+<button id="add">add ele2</button>
 
 <script type="module">
-  import { Timeline, Animation } from './animation.js';
+  import { Timeline, Animation, ColorAnimation } from './animation.js';
   import { cubicBezier } from './cubicBezier.js';
 
   let el = document.getElementById('el');
+  let el2 = document.getElementById('el2');
   let btnStart = document.getElementById('start');
   let btnPause = document.getElementById('pause');
   let btnResume = document.getElementById('resume');
-  
+  let btnRestart = document.getElementById('restart');
+  let btnAdd = document.getElementById('add');
+
   let tl = new Timeline();
 
   btnStart.addEventListener('click', () => tl.start());
   btnPause.addEventListener('click', () => tl.pause());
   btnResume.addEventListener('click', () => tl.resume());
+  btnRestart.addEventListener('click', () => tl.restart());
+  btnAdd.addEventListener('click', () => {
+    tl.add(new Animation(el2.style, 'transform', (v) => `translateX(${v}px)`, 0, 500, 3000, 0, linear));
+  });
 
   // 动画函数
   let linear = (t) => t;
   let ease = cubicBezier(0.25, 1, 0.25, 1);
 
   tl.add(new Animation(el.style, 'transform', (v) => `translateX(${v}px)`, 0, 500, 3000, 0, linear));
+  tl.add(new ColorAnimation(el.style, 'backgroundColor', { r: 0, g: 0, b: 0, a: 0.5 }, { r: 255, g: 0, b: 255, a: 1 }, 3000, 0, linear));
 
-  tl.start();
+  // tl.start();
 </script>

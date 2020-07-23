@@ -128,6 +128,7 @@ class Carousel {
 
       setTimeout(nextPic, 3000);
     };
+    
     setTimeout(nextPic, 3000);
 
     root.addEventListener('mousedown', (event) => {
