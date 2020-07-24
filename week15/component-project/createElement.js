@@ -1,4 +1,4 @@
-// import { Text, Wrapper } from './Components.js';
+import { Timeline, Animation } from './animation/animation.js';
 
 function createElement(Cls, attributes, ...children) {
   let o;
@@ -93,6 +93,9 @@ class Carousel {
 
   render() {
     let position = 0;
+    let currentAnimation = null;
+    let nextAnimation = null;
+    let timeline = null;
 
     let children = this.props.data.map((url) => {
       let element = <img src={url} />;
@@ -109,27 +112,52 @@ class Carousel {
       let current = children[position];
       let next = children[nextPosition];
 
-      current.style.transition = 'ease 0s';
-      next.style.transition = 'ease 0s';
+      // current.style.transition = 'ease 0s';
+      // next.style.transition = 'ease 0s';
 
-      // 起始位置
-      current.style.transform = `translateX(${-100 * position}%)`;
-      next.style.transform = `translateX(${-100 * nextPosition + 100}%)`;
+      // // 起始位置
+      // current.style.transform = `translateX(${-100 * position}%)`;
+      // next.style.transform = `translateX(${-100 * nextPosition + 100}%)`;
 
-      setTimeout(() => {
-        current.style.transition = ''; // means use css rule
-        next.style.transition = '';
+      // setTimeout(() => {
+      //   current.style.transition = ''; // means use css rule
+      //   next.style.transition = '';
 
-        // 终止位置
-        current.style.transform = `translateX(${-100 * position - 100}%)`;
-        next.style.transform = `translateX(${-100 * nextPosition}%)`;
-        position = nextPosition;
-      }, 16);
+      //   // 终止位置
+      //   current.style.transform = `translateX(${-100 * position - 100}%)`;
+      //   next.style.transform = `translateX(${-100 * nextPosition}%)`;
+      //   position = nextPosition;
+      // }, 16);
+
+      currentAnimation = new Animation(
+        current.style,
+        'transform',
+        (v) => `translateX(${v}%)`,
+        -100 * position,
+        -100 * position - 100,
+        2000,
+      );
+
+      nextAnimation = new Animation(
+        next.style,
+        'transform',
+        (v) => `translateX(${v}%)`,
+        -100 * nextPosition + 100,
+        -100 * nextPosition,
+        2000,
+      );
+
+      timeline = new Timeline();
+      timeline.add(currentAnimation);
+      timeline.add(nextAnimation);
+      timeline.start();
+
+      position = nextPosition;
 
       setTimeout(nextPic, 3000);
     };
-    
-    setTimeout(nextPic, 3000);
+
+    setTimeout(nextPic, 1000);
 
     root.addEventListener('mousedown', (event) => {
       // event 中有很多表示鼠标位置的值，推荐使用 `clientX` 和 `clientY`，相当于可视区域的坐标，非常准确并且没有歧义，和浏览器窗口里面的可渲染区域一一对应。

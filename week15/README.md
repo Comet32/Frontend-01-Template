@@ -11,6 +11,8 @@
   - [component-project](./component-project)
 - 看完[ 2. 组件化 | 动画](https://u.geekbang.org/lesson/12?article=263034), 跟上课程进度，完成 animation，并完善 component
   - [animation](./animation)
+  - 使用 animation 完善 component
+    - [createElement](./component-project/createElement.js) 132 ~ 153
 
 
 
