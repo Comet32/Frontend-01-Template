@@ -1,0 +1,41 @@
+<style>
+  div {
+    width: 200px;
+    height: 200px;
+    background-color: lightslategrey;
+  }
+</style>
+
+<body>
+  <div id="ele" style="transform: translate(0, 0);"></div>
+</body>
+<script src="./gesture.js"></script>
+<script>
+  let ele = document.getElementById('ele');
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  document.addEventListener('selectstart', (e) => e.preventDefault());
+  // 这里需要手动将 `passive` 可选项设置为 false，因为在某些浏览器中（fireFox 和 chrome）会默认设置为 `true`，从而使监听方法中无法调用 preventDefault
+  document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+
+  document.body.addEventListener('tap', () => {
+    console.log('tap!!!!!!!');
+  });
+
+  let x = 0,
+    y = 0;
+
+  enableGesture(ele);
+
+  ele.addEventListener('pan', (event) => {
+    console.log(123);
+    console.log('event', event);
+    ele.style.transform = `translate(${x + event.clientX - event.startX}px,${y + event.clientY - event.startY}px)`;
+  });
+
+  ele.addEventListener('panend', (event) => {
+    x = x + event.clientX - event.startX;
+    y = y + event.clientY - event.startY;
+  });
+
+  ele.addEventListener('flick',(e)=> {console.log('e', e)})
+</script>
