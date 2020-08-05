@@ -1,5 +1,6 @@
 import { createElement, Text, Wrapper } from './createElement.js';
 import { Timeline, Animation } from './animation/animation_set.js';
+import css from './carousel.css'
 
 export class Carousel {
   constructor(config) {
