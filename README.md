@@ -36,7 +36,7 @@
 #姓名:赵恩啸
 #班级:1班
 #小组:5组
-#作业&总结链接:https://github.com/Comet32/Frontend-01-Template/tree/master/week17
+#作业&总结链接:https://github.com/Comet32/Frontend-01-Template/tree/master/week18
 ```
 
 - 作业提交地址：https://github.com/GeekUniversity/Frontend-01-Template/issues
