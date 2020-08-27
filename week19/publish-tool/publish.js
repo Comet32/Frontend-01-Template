@@ -53,8 +53,9 @@ const server = http.createServer((request, res) => {
     req.end();
     console.log('publish success');
     // 关闭服务器
-    // server.close();
-  });
+    res.end('publish success!!');
+    server.close();
+  });``
 
 });
 
