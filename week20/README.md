@@ -11,5 +11,5 @@
   - [check](./check)
 - 选做：用 promise 管理代码
   - [publish-server](../week19/publish-server-http)
-  - [publish-tool](../week19/publish-tool)
+  - [publish-tool](../week19/)
 
