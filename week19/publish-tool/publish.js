@@ -3,12 +3,13 @@ const fs = require('fs');
 const archiver = require('archiver');
 const child_process = require('child_process');
 
-let port = 8081;
-let packName = './package';
+let port = 8080;
+let packName = './dist';
 
 // fs.stat(filePath, (error, stat) => {
 
-let redirect_url = 'http://localhost:8080/auth/expert?id=123';
+let redirect_url = 'http://enxiao.io:8088/auth/expert?id=123';
+
 child_process.exec(
   `exec open 'https://github.com/login/oauth/authorize?client_id=Iv1.fa2947b3f166f1ab&redirect_url=${redirect_url}&scope=read%3Auser&state=123abc'`,
 );
@@ -22,7 +23,7 @@ const server = http.createServer((request, res) => {
 
   const options = {
     host: 'localhost',
-    port: 8080,
+    port: 8088,
     path: '/?filename=' + 'package.zip',
     method: 'POST',
     headers: {
@@ -55,7 +56,7 @@ const server = http.createServer((request, res) => {
     // 关闭服务器
     res.end('publish success!!');
     server.close();
-  });``
+  });
 
 });
 

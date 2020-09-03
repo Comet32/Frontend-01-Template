@@ -1,5 +1,5 @@
 {
-  "name": "publish-tool",
+  "name": "toy-publish-tool",
   "version": "1.0.0",
   "description": "",
   "main": "publish.js",

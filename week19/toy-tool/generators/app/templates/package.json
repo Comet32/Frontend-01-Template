@@ -7,7 +7,9 @@
     "start": "webpack-dev-server",
     "test": "mocha --require @babel/register",
     "coverage": "nyc mocha",
-    "build": "webpack"
+    "build": "webpack",
+    "publish": "node /usr/local/lib/node_modules/toy-publish-tool/publish.js",
+    "lint": "eslint ./src"
   },
   "keywords": [],
   "author": "",

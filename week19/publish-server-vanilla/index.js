@@ -77,7 +77,7 @@ function auth(req, res) {
         let token = matchedRes[1];
         console.log('token', token);
         res.writeHead(200, { access_token: token, 'Content-Type': 'text/html' });
-        res.end(`<a href="http://localhost:8081/publish?token=${token}">publish</a>`);
+        res.end(`<a href="http://localhost:8080/publish?token=${token}">publish</a>`);
       } else {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('auth error');
@@ -92,4 +92,4 @@ function auth(req, res) {
   request.end();
 }
 
-server.listen(8080);
+server.listen(8081);
