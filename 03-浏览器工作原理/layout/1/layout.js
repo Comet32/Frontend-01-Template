@@ -3,7 +3,6 @@ function getStyle(element){
         element.style = {};
     }
     for(let prop in element.computedStyle){
-        var p = element.computedStyle.value;
         element.style[prop] = element.computedStyle[prop].value;
         if(element.style[prop].toString().match(/px$/)){
             element.style[prop] = parseInt(element.style[prop]);
@@ -14,6 +13,7 @@ function getStyle(element){
     }
     return element.style;
 }
+
 function layout(element){
     if(!element.computedStyle){
         return;

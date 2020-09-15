@@ -14,6 +14,7 @@ function getStyle(element){
     }
     return element.style;
 }
+
 function layout(element){
     if(!element.computedStyle){
         return;
@@ -108,10 +109,11 @@ function layout(element){
     var isAutoMainSize = false;
     if(!style[mainSize]){
         elementStyle[mainSize] = 0;
-        for(var i =0; i<items.legth; i++){
+        for(var i =0; i<items.length; i++){
             var item = items[i];
+            var itemStyle = item.style;
             if(itemStyle[mainSize] !== null || itemStyle[mainSize] !== (void 0)){
-                elementStyle[mainSize] = elementStyle[mainSize] + itemStyle[mainSize];
+                elementStyle[mainSize] += itemStyle[mainSize];
             }
         }
         isAutoMainSize = true;
@@ -123,7 +125,7 @@ function layout(element){
     var mainSpace = elementStyle[mainSize];
     var crossSpace = 0;
 
-    for(var i =0; i < items.legth; i++){
+    for(var i =0; i < items.length; i++){
         var item = items[i];
         var itemStyle = getStyle(item);
         if(itemStyle[mainSize] === null){

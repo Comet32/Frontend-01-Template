@@ -2,7 +2,7 @@ let currentToken = null;
 let currentAttribute = null;
 
 let stack = [{type: "document", children:[]}];
-let currenTextNode = null;
+let currentTextNode = null;
 
 function emit(token){
     let top = stack[stack.length -1];
@@ -25,14 +25,14 @@ function emit(token){
         if(!token.isSelfCloseing){
             stack.push(element);
         }
-        currenTextNode = null;
+        currentTextNode = null;
     }else if(token.type == "endTag"){
         if(top.tagName != token.tagName){
             throw new Error("Tag start end doesn't match!")
         }else {
             stack.pop();
         }
-        currenTextNode = null;
+        currentTextNode = null;
     }else if(token.type == "text"){
        if(currentTextNode == null){
            currentTextNode = {
@@ -263,6 +263,7 @@ function afterAttrbutrName(c) {
         return attributeName(c);
     }
 }
+
 module.exports.parseHTML = function parseHTML(html){
    let state = data;
    for(let c of html){

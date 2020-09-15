@@ -216,8 +216,9 @@ void async function () {
       }
   })
 
-  let response = await request.send()
+  let response = await request.send();
   let dom = parser.parseHTML(response.body);
+  
   // request.write(request.toString())
 }()
 // const client = net.createConnection({  

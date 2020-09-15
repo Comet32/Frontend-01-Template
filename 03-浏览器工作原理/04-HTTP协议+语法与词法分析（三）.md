@@ -51,7 +51,7 @@ module.exports.parseHTML = function (html) {
 - 所以我们需要查看一下标准，在：https://html.spec.whatwg.org/multipage/parsing.html#tokenization
 
 - HTML 很奇葩，别的语言像之前讲过的 JS ，它的词法会用产生式去定义，而 HTML 标准的服务很到位直接将状态机的状态给写出来了，而且写出来的每一章节就是伪代码，所以我们可以直接用这个伪代码来逐字逐句的翻译为 JS 代码。
-- 在 tokenization 章节中定义了 80 个状态，但其中会有处理 RCDATA 和 Script 的状态，还有处理 comment、DOCTYPE 等，所以里面有很多东西是我们没有必要去做的，我们只需要用到 20 个左右的状态就可以实现一个基本的带标签的一个 HTML 语法。
+- 在 tokenization 章节中定义了 80 个状态，但其中会有处理 RCDATA 和 Script 的状态，还有处理 comment、DOCTYPE 等，所以里面有很多东西是我们没有必要去做的，我们只需要用到 20 个左右的状态就可以实现一个基本的带标签的 HTML 语法。
 
 #### 改造 server.js
 
@@ -129,7 +129,7 @@ module.exports.parseHTML = function parseHTML(html) {
 ![image-20200605202308692](assets/image-20200605202308692.png)
 
 - 举例说明：比如 data 状态只会接收一个小于号 `<` 也就是开始标签的标志，接受之后进入「tag open」状态，如果接受一个 `/` 斜杠则会进入「eng tag open」状态，或是接受字母到「tag name」状态。然后，无论是「tag open」还是「end tag open」都是可以进入「tag name」状态的。「tag name」可以进入处理属性的状态「before attribute name」也可以进入自封闭标签「Self-closing start tag」
-- 所以痛过上图可以知道，根据接受的输入字符的不同，状态机会在不同的状态之间进行切换，最终去到固定状态机或是将输入消耗完之后停止在某个状态。
+- 所以通过上图可以知道，根据接受的输入字符的不同，状态机会在不同的状态之间进行切换，最终去到固定状态机或是将输入消耗完之后停止在某个状态。
 
 以下图示是 winter 自己所写的用图示和控制台的打印来直观感受解析 HTML 过程的小应用：
 
@@ -138,7 +138,7 @@ module.exports.parseHTML = function parseHTML(html) {
 ![image-20200605203228229](assets/image-20200605203228229.png)
 
 - 在文本输入框中输入一段 html 代码，然后点击 parse 按钮解析开始。
-- 然后状态机开始不断的吞入字符，随着吞入不同的字符，状态开始发生迁移，并且会在右侧控制台打印出来，同时在图示中用红色圆形表示当前状态所处位置。
+- 然后状态机开始不断的吞入字符，随着吞入不同的字符，**状态开始发生迁移**，并且会在右侧控制台打印出来，同时在图示中用红色圆形表示当前状态所处位置。
 - 当状态位于 data 时会打印一个对象标示一个完整的 token
 
 #### 总结
@@ -212,6 +212,8 @@ function data(c){
 >
 >   **Emit the [current input character](https://html.spec.whatwg.org/multipage/parsing.html#current-input-character) as a character token.**
 
+
+
 接下来，如果在 `data` 状态中接收到 `<` 字符则会迁移到 `tagOpen` 状态：
 
 ```js
@@ -233,6 +235,8 @@ function tagOpen(c){
 ```
 
 - 如果下一个字符是英文字符则会将一个 token 信息对象放入 `currentToken` 此模块的全局变量中暂存，此时并不能确定此 token 的 type，只是暂定为 `startTag` ，然后再进入 `tagName` 状态，之后可能会设置 `currentToken` 的属性。
+
+
 
 来到 `tagName` 状态：
 
@@ -256,8 +260,10 @@ function tagName(c){
 
 - 如果为字母则会设置 `tagName` ，按照 [HTML 规范](https://html.spec.whatwg.org/multipage/parsing.html#tag-name-state)是需要做 `toLowerCase` 的操作的。如果想要 `JSX` 风格的标签，则需要做区分大小写，那么就不能做转换为小写的操作。在这里我们就不进行转换了，毕竟我们只是通过这个 toy-browser 来理解浏览器。
 - 如果是空格则会进入 `beforeAttributeName` 状态
-- 如果是 `>` 则说明形成了一个标签，则会将其 `emit` 掉
-- 如果是 `/` 则说明是自封闭标签则进入 `selfClosingStartTag` 状态
+- 如果是 `>` 则说明形成了一个标签，会将其 `emit` 掉
+- 如果是 `/` 则说明是自封闭标签，进入 `selfClosingStartTag` 状态
+
+
 
 #### 总结
 
@@ -265,6 +271,8 @@ function tagName(c){
 
 - 业务逻辑在这里是指更改 `currentToken` 全局变量
 - 这里的「标签结束状态」是指遇到 `>` 字符，而不是指结束标签。
+
+
 
 ### 第五步：处理属性
 
@@ -310,7 +318,7 @@ function beforeAttributeName(c){
 ```js
 function attributeName(c) {
   if(c.match(/^[\t\n\f ]$/) || c === "/" || c === ">" || c === EOF) {
-    return afterAttributeAName(c);
+    return afterAttributeName(c);
   } else if(c === "=") {
     return beforeAttributeValue;
   } else if(c === '\u0000') {
@@ -324,7 +332,7 @@ function attributeName(c) {
 }
 ```
 
-- 如果字符 c 不是以上的特殊字符，则会将其追加到 `currentAtteribute.name` 字符串属性的最后作为属性名的其中一个字符，并且依然处于 `attributeName` 状态。
+- 11~ 12，如果字符 c 不是以上的特殊字符，则会将其追加到 `currentAttribute.name` 字符串属性的最后作为属性名的其中一个字符，并且依然处于 `attributeName` 状态。
 
 - 当 c 为 `=` 时，说明属性名称的部分结束，则需要进入到下一个状态 `beforeAttributeValue` ，`beforeAttributeValue` 状态实际上是在处理是 `'` `"` 或者没引号开头
 
@@ -399,7 +407,7 @@ let stack = [{type: 'document', children: []}];
 
 如何处理？首先先创建一个 element。
 
-很多同学会把 element 和 tag 搞混，其实在我们的这个架构里，学习了浏览器的工作原理之后，我们会发现 element 是最终构造出来的东西，tag 其实是写代码文本层面的称呼，所以在词法阶段是会有 tag 的概念，但等到构建 dom 的树的时候会叫 element。
+很多同学会把 element 和 tag 搞混，其实在我们的这个架构里，学习了浏览器的工作原理之后，我们会发现 **element 是最终构造出来的东西，tag 其实是写代码文本层面的称呼，所以在词法阶段是会有 tag 的概念，但等到构建 dom 的树的时候会叫 element。**
 
 ```js
 function emit(token){
@@ -408,12 +416,12 @@ function emit(token){
   
   // 处理 startTag
   if(token.type === "startTag") {
+    // 创建元素节点
     let element = {
       type: "element",
       children: [],
       attributes: []
     }
-
 
     element.tagName = token.tagName;
 

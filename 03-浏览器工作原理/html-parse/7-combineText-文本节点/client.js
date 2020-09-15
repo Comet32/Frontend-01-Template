@@ -1,6 +1,7 @@
 
 const net = require('net');
 const parser =require("./parser.js")
+
 class Request{
   constructor(options){
     this.method = options.method || "GET";
@@ -39,12 +40,13 @@ ${this.bodyText}`
         });
       }
       connection.on('data', (data) => {
-        parser.receiveChar(data.toString());
-        // resolve(data.toString());
+        let dataString = data.toString();
+        parser.receiveChar(dataString);
+        resolve(data.toString());
         if(parser.isFinished){
           resolve(parser.response());
         }
-        console.log(parser.statusLine)
+        console.log('parser.statusLine ==>',parser.statusLine)
         connection.end();
       });
       connection.on('error', (err) => {
@@ -54,9 +56,11 @@ ${this.bodyText}`
     });  
   }
 }
+
 class Response{
 
 }
+
 class ResponseParser{
   constructor(){
     this.WAITING_STATUS_LINE = 0;
@@ -151,6 +155,7 @@ class ResponseParser{
     }
   }
 }
+
 class TrunkedBodyParser{
   constructor(){
     this.WAITING_LENGTH = 0;
@@ -163,6 +168,7 @@ class TrunkedBodyParser{
     this.isFinished = false;
     this.current = this.WAITING_LENGTH;
   }
+
   receiveChar(char){
     if(this.current === this.WAITING_LENGTH){
       if(char === '\r'){
@@ -180,7 +186,6 @@ class TrunkedBodyParser{
       if(char === '\n'){
         this.current = this.READING_TRUNK;
       }
-
     }else if(this.current === this.WAITING_LENGTH_LINE_END){
       if(char === '\n'){
         this.current = this.READING_TRUNK;
@@ -202,7 +207,9 @@ class TrunkedBodyParser{
     }
   }
 }
+
 void async function () {
+
   let request = new Request({
       method: 'GET',
       path: '/',
@@ -216,10 +223,13 @@ void async function () {
       }
   })
 
-  let response = await request.send()
+  let response = await request.send();
+  console.log('response', response);
   let dom = parser.parseHTML(response.body);
+  console.log('dom', dom);
   // request.write(request.toString())
 }()
+
 // const client = net.createConnection({  
 //     host:'127.0.0.1',
 //     port: 8088 }, () => {
