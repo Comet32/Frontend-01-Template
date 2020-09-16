@@ -12,7 +12,7 @@
 
 零零碎碎的其他属性，比如 `will-change` 辅助类属性。
 
-### Animation
+### Animation 动画
 
 ![image-20200612150637162](assets/image-20200612150637162.png)
 
@@ -26,11 +26,11 @@
 
 只要刷新的频率在每秒 60 次以上人眼就会感觉很平滑，电影一般 24 48（李安 - 120，高速运动也能表现的很真实、顺畅），游戏会选择 60，24 在物体并非高速运动的情况下会比较顺畅，48 在我们没有操作时的情况下比较顺畅，60 就是你玩游戏操作也会感觉很顺畅。
 
-**「关键帧」的意思是我们在定义时只需要去设置关键的那些帧，其他帧所显示的内容都是由这么关键帧所算出来的。**
+**「关键帧」的意思是我们在定义时只需要去设置关键的那些帧，其他帧所显示的内容都是根据关键帧所算出来的。**
 
 那么如何去计算呢？
 
-我们先假设这些帧的变化是均匀的，那么计算就会比较容易，你知道在这个相同时间内，元素的属性值是如何变化的。当然实际的属性中可以通过设置其贝塞尔曲线来控制其变化的方式，从而计算的方结果也会发现变化。
+我们先假设这些帧的变化是均匀的，那么计算就会比较容易，你知道在这个相同时间内，元素的属性值是如何变化的。当然实际的属性中可以通过设置其贝塞尔曲线来控制其变化的方式，从而计算的结果也会发现变化。
 
 #### Animation 属性
 
@@ -39,13 +39,13 @@
 - `animation` 属性实际上是一个 `shorthand`  快捷、简写的属性，是由以下属性组成：
 
   - [`animation-name`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-name): 
-  - [`animation-duration`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-duration): 快慢控制
+  - [`animation-duration`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-duration): 动画持续的时长，也可以理解是动画快慢的控制
   - [`animation-timing-function`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-timing-function):  决定中间桢的计算方式
-  - [`animation-delay`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-delay): 
-  - [`animation-direction`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction): 
-  - [`animation-iteration-count`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count): 
-  - [`animation-fill-mode`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode): 
-  - [`animation-play-state`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state): 
+  - [`animation-delay`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-delay): 延迟
+  - [`animation-direction`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-direction): 方向
+  - [`animation-iteration-count`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-iteration-count): 重复次数
+  - [`animation-fill-mode`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-fill-mode): 动画执行之前和执行之后的样式
+  - [`animation-play-state`](https://developer.mozilla.org/en-US/docs/Web/CSS/animation-play-state): 动画状态：暂停还是进行
 
    
 
@@ -54,9 +54,9 @@
 <img src="assets/image-20200612152447948.png" alt="image-20200612152447948" style="zoom:100%;" />
 
 - 关键帧是可以通过设置 `transition` 来单独控制 `timing-function` 的
-- `0%` ～ `100%` 可以用别名 `from` `to` 来代替
+- `0%` ～ `100%` 可以用**别名** `from` `to` 来代替
 
-### Trasition
+### Trasition 动画
 
 #### transition 属性
 
@@ -77,14 +77,14 @@
 
 图中的坐标系的横轴表示时间，纵轴表示属性值，整条曲线就表示你的动画过程中属性值的变化。
 
-> 之所以使用曲线是因为曲线比较符合人的感觉。
+> 之所以使用曲线是因为曲线比较符合人对事物运动的直觉。
 
 CSS `timing function` 只能使用三次贝塞尔曲线 ，三次贝塞尔曲线是由一个起始点和一个终止点还有两个控制点来决定的，两个控制点会决定曲线的形状。
 
 - `cubic-bezier()` 函数的前两个值决定了上图中红色控制点的位置，第一个值决定其在 x 轴上的位置，第二个值决定了其在 y 轴上的位置。后两个值决定了蓝色球的位置，第三个值决定了蓝球 x 轴上的位置，第四个值决定了篮球 y 轴上的位置。
 - x 轴的值的范围在 0 ～ 1 之间，y 轴的值没有限制，甚至是负值，所以可以实现反向运动。
 
-两个控制点可以设置复值从而产生属性值一开始会往回缩，然后再回到去终止点的方向：
+两个控制点可以设置负值从而产生属性值一开始会往回缩，然后再回到去终止点的方向：
 
 ![image-20200613154239781](assets/image-20200613154239781.png)
 
@@ -103,7 +103,7 @@ CSS `timing function` 只能使用三次贝塞尔曲线 ，三次贝塞尔曲线
 
 #### 贝塞尔曲线是什么
 
-贝塞尔曲线其实并不是贝塞尔发明的，贝塞尔只是起到了将其工程化的作用，当然这体现了工程师的作用。最开始是雷诺汽车厂所研究出来的贝塞尔曲线，用于设计车身，利用贝塞尔曲线的差值特征使车身的形状更自然。
+贝塞尔曲线其实并不是贝塞尔发明的，贝塞尔只是起到了将其**工程化的作用**，当然这体现了工程师的作用。最开始是雷诺汽车厂所研究出来的贝塞尔曲线，用于设计车身，利用贝塞尔曲线的差值特征使车身的形状更自然。
 
 我们所使用的是三次贝塞尔曲线，那么为什么叫三次贝塞尔曲线？
 
@@ -154,14 +154,14 @@ CSS `timing function` 只能使用三次贝塞尔曲线 ，三次贝塞尔曲线
 
 #### 问答
 
-- 动画性能有什么学习的地方吗？
+- 动画性能有什么学习的地方吗？（可以看 chrome 的优化内容）
   - 动画性能自己能控制的不是特别多
   - 建议大家使用 `transform` 动画而不是 `top left` 动画，因为 `top left` 进行了 layout
 - 小甜饼是什么？
   - 比喻一个方便你平时编程的小特性，并不太改变整体的设计的东西，不用也可以，用了很舒服。
 
 - CSS 动画和 gif 比有什么优势？
-  - CSS 动画比 gif 的优势就很大了，因为 gif 是一种很差格式，任何使用都不推荐使用 gif 动画，哪怕是使用很小的 video，那都比使用 gif 的性能要好很多。gif 纯粹是位图定义的，性能杀手，少用。
+  - CSS 动画比 gif 的优势就很大了，因为 gif 是一种很差格式，任何使用都不推荐使用 gif 动画，**哪怕是使用很小的 video，那都比使用 gif 的性能要好很多**。gif 纯粹是位图定义的，性能杀手，少用。
 - CSS 与 JS 哪个实现动画的性能更好？
   - 理论上是 CSS，其实要看具体的情况，所以需要在实际的场景上进行测试，查看哪个性能好。
 - 能不用 JS 来实现所有的动画吗？
@@ -305,18 +305,12 @@ W3C 最早在设计 HSL 和 HSV 的时候有过一定的争论，最后选择了
 补充：
 
 - svg 可以直接通过 AE 和 PS 导出。
-
 - 我们让那些 CSS 属性回归到它们本来的功能，border 就让它去做边框吧。CSS 也讲究语义的。
-
 - 相对于位图，图形越简单 svg 的优势越大。
-
 - canvas 是 js 画的， svg 是一种矢量图格式，是用 xml 去写的，没有相关性。 
-
 - 可以通过去查看 http://w3school.com.cn/svg 来简单的过一遍基础。
   - path 可以画任何图形
-
-- svg 可以直接从设计师手中要到，除了极个别情况不需要你来手写，手写比较特殊场景。
-
+- svg 可以直接从设计师手中要到，除了极个别情况之外不需要你来手写，手写比较特殊场景。
 - 使用 data uri 是可以将其放到 background 中
 
 
