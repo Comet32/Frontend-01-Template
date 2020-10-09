@@ -291,10 +291,12 @@
 
       // 对于要下棋子那一方的最好预判，优化：可以给 pattern 添加一个 hash，如果已经搜索过这个模式，就不用搜
       function bestChoice(pattern, piece) {
+        debugger
         let key = pattern.toString() + piece; // 使用当前棋局的模型和棋方形成一个字符串 hash key
         if(manual.get(key)){
           return manual.get(key);
         }
+
         let point = willWin(pattern, piece);
         // 如果有 point 说明要胜利了，这里也是递归的退出条件之一
         if (point) {
@@ -317,7 +319,7 @@
             // 我方在某个空位下一个棋子
             temp[i][j] = piece;
             // 获取对手的最好选择
-            let opposite = bestChoice(temp, piece === O ? X : O); 
+            let opposite = bestChoice(temp, piece === O ? X : O);
             // 对手最差的结果就是我方最想要的结果，那么对 opposite.result 取反则是我方想要的情况
             // 如果这个情况比我方现在的情况好，那么我就用这个结果
             if (-opposite.result >= result) {
